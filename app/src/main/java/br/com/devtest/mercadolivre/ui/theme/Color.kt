@@ -2,14 +2,15 @@ package br.com.devtest.mercadolivre.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val PrimaryYellow = Color(0xFFFFE600)
+val SecondaryYellow = Color(0xFFF9CF05)
+val TertiaryBlue = Color(0xFF293382)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val AccentRed = Color(0xFFF84B57)
+val AccentGreen = Color(0xFF00A650)
+val AccentBlue = Color(0xFF3483FA)
 
-val LightYellow = Color(0xFFFEE600)
-val DarkYellow = Color(0xFFF9CF05)
-val DarkBlue = Color(0xFF293382)
+val LightBlack = Color(0xFF090909)
+val DarkGray = Color(0xFF333333)
+val LightGray = Color(0xFF737373)
+
