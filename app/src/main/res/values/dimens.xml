@@ -8,8 +8,9 @@
     <dimen name="spacing_xl">32dp</dimen>
 
     <!-- Padding -->
-    <dimen name="padding_xs">4dp</dimen>
-    <dimen name="padding_sm">8dp</dimen>
+    <dimen name="padding_xxs">4dp</dimen>
+    <dimen name="padding_xs">8dp</dimen>
+    <dimen name="padding_sm">12dp</dimen>
     <dimen name="padding_md">16dp</dimen>
     <dimen name="padding_lg">24dp</dimen>
     <dimen name="padding_xl">32dp</dimen>
