@@ -77,7 +77,7 @@ fun SearchScreen(
                 SearchBar(
                     query = queryInput.value,
                     onQueryChange = viewModel::setQueryInput,
-                    placeholder = "Buscar produtos",
+                    placeholder = stringResource(R.string.search_one_item),
                     onSearch = {
                         viewModel.fetchSearchResults()
                         navigateToSearchResults.invoke()

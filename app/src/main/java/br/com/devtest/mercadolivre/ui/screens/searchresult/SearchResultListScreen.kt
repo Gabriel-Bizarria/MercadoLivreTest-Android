@@ -78,7 +78,7 @@ fun SearchResultListScreen(
         }
         
         SearchBar(
-            placeholder = "Search for products",
+            placeholder = stringResource(R.string.search_one_item),
             query = query.value,
             onQueryChange = {
                 viewModel.setQueryInput(it)

@@ -13,7 +13,8 @@ class SearchRepositoryImpl(private val apiService: ApiService) : SearchRepositor
         return when (result) {
             is NetworkResponse.Success -> {
                 val list = result.data.results
-                    ?.filter { it?.id != null && !it.title.isNullOrBlank() && it.price != null }
+                    ?.filterNotNull()
+                    ?.filter { it.id != null && !it.title.isNullOrBlank() && it.price != null }
                     ?.map { it.toProductUiModel() }
                     .orEmpty()
                 NetworkResponse.Success(list)
