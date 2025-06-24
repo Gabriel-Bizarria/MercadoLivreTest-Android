@@ -10,7 +10,11 @@ val AccentRed = Color(0xFFF84B57)
 val AccentGreen = Color(0xFF00A650)
 val AccentBlue = Color(0xFF3483FA)
 
+val lightGreen = Color(0xFFE0F2E8)
+
 val LightBlack = Color(0xFF090909)
 val DarkGray = Color(0xFF333333)
 val LightGray = Color(0xFF737373)
+
+val SurfaceWhite = Color(0xFFF0F0F0)
 
