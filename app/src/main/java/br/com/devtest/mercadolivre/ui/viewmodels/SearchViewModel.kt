@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import br.com.devtest.mercadolivre.data.utils.onFailure
 import br.com.devtest.mercadolivre.data.utils.onSuccess
 import br.com.devtest.mercadolivre.domain.repository.SearchRepository
-import br.com.devtest.mercadolivre.ui.models.ProductUiModel
+import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.ui.state.UiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -16,14 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val searchRepository: SearchRepository,
+    private val repository: SearchRepository,
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
 
     private val _queryInput = MutableStateFlow<String>("")
     val queryInput = _queryInput.asStateFlow()
 
-    private val _searchUiState = MutableStateFlow<UiState<List<ProductUiModel>>>(UiState.Loading)
+    private val _searchUiState = MutableStateFlow<UiState<List<ProductListItemUiModel>>>(UiState.Loading)
     val searchUiState = _searchUiState.asStateFlow()
 
     private val viewModelCustomScope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -35,7 +35,7 @@ class SearchViewModel(
     fun fetchSearchResults() {
         viewModelCustomScope.launch {
             _searchUiState.value = UiState.Loading
-            searchRepository.getSearchResults(queryInput.value)
+            repository.getSearchResults(queryInput.value)
                 .onSuccess { data ->
                     _searchUiState.value = UiState.Success(data)
                 }

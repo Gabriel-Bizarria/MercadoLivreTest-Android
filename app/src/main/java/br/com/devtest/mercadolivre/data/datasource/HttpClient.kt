@@ -24,26 +24,41 @@ fun createMockKtorClient(context: Context): HttpClient {
         }
         engine {
             addHandler { request ->
-                // Simulate a delay to mimic network latency
+                // Simula delay de rede
                 delay(NETWORK_DELAY_MS)
-                // Extracts the search parameter from the request URL
                 val searchParam = request.url.parameters["q"]
-                // Defines the file name based on the search parameter
-                val fileName = if (!searchParam.isNullOrBlank()) {
-                    "${searchParam}-query-list.json"
-                } else {
-                    "mock_default.json"
+                val idsParam = request.url.parameters["ids"]
+                val isDescription = request.url.encodedPath.endsWith("description")
+                val fileName = when {
+                    !idsParam.isNullOrBlank() -> {
+                        val id = idsParam
+                        if (isDescription) {
+                            "item-${id}-description.json"
+                        } else {
+                            "item-${id}.json"
+                        }
+                    }
+                    !searchParam.isNullOrBlank() -> {
+                        "${searchParam}-query-list.json"
+                    }
+                    else -> {
+                        "mock_default.json"
+                    }
                 }
-                // Read the JSON file from the assets folder
-                val json = try {
-                    context.assets.open(fileName).bufferedReader().use { it.readText() }
-                } catch (e: Exception) {
-                    // If the file is not found, return an empty JSON object
-                    "{}"
+                val (json, status) = try {
+                    val content = context.assets.open(fileName).bufferedReader().use { it.readText() }
+                    content to HttpStatusCode.OK
+                } catch (_: Exception) {
+                    if (isDescription) {
+                        "" to HttpStatusCode.NotFound
+                    } else {
+                        "{}" to HttpStatusCode.OK
+                    }
                 }
+
                 respond(
                     content = json,
-                    status = HttpStatusCode.OK,
+                    status = status,
                     headers = headersOf(HttpHeaders.ContentType, "application/json")
                 )
             }
