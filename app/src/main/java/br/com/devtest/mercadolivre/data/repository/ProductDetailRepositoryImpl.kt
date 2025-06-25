@@ -23,17 +23,18 @@ class ProductDetailRepositoryImpl(
                 id = details.id.orEmpty(),
                 title = details.title.orEmpty(),
                 price = (details.price ?: 0.0).toBigDecimalMonetary(),
-                originalPrice = (details.originalPrice ?: 0.0).toBigDecimalMonetary(),
+                originalPrice = (details.originalPrice)?.toBigDecimalMonetary(),
                 images = details.pictures?.map { it?.secureUrl.orEmpty() }.orEmpty(),
                 freeShipping = details.shipping?.freeShipping == true,
                 attributes = details.attributes?.map {
                     AttributeUiModel(
-                        type = it?.id.orEmpty(),
-                        value = it?.valueName
+                        attributeId = it?.id.orEmpty(),
+                        attributeName = it?.name,
+                        valueName = it?.valueName
                     )
                 }.orEmpty(),
                 currencyId = details.currencyId,
-                description = description.plainText
+                description = description.plainText,
             )
             return NetworkResponse.Success(productUiModel)
         } else {

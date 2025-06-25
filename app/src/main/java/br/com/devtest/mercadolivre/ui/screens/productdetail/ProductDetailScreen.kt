@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +29,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,8 +38,10 @@ import br.com.devtest.mercadolivre.R
 import br.com.devtest.mercadolivre.ui.commons.components.ErrorScreen
 import br.com.devtest.mercadolivre.ui.commons.components.FreeShippingBadge
 import br.com.devtest.mercadolivre.ui.commons.components.ImageCarousel
+import br.com.devtest.mercadolivre.ui.models.AttributeUiModel
 import br.com.devtest.mercadolivre.ui.models.ProductDetailUiModel
 import br.com.devtest.mercadolivre.ui.state.UiState
+import br.com.devtest.mercadolivre.ui.theme.DarkGray
 import br.com.devtest.mercadolivre.ui.theme.MercadoLivreDevTestTheme
 import br.com.devtest.mercadolivre.ui.viewmodels.ProductDetailViewModel
 import br.com.devtest.mercadolivre.utils.AppLog
@@ -80,7 +86,7 @@ fun ProductDetailScreen(
             Box(
                 modifier = modifier
                     .fillMaxSize()
-            ){
+            ) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier
@@ -110,11 +116,13 @@ fun ProductContent(
     val density = LocalDensity.current.density
     val widthPx = LocalWindowInfo.current.containerSize.width
     val width = (widthPx / density).dp
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
+            .verticalScroll(state = scrollState)
     ) {
         ImageCarousel(
             imageUrls = productDetailUiModel.images,
@@ -154,9 +162,10 @@ fun ProductContent(
                     vertical = dimensionResource(R.dimen.padding_xxs)
                 )
         ) {
-            val brandAttribute = productDetailUiModel.attributes.firstOrNull { it.type == "BRAND" }
-            val brand = if (brandAttribute != null && !brandAttribute.value.isNullOrEmpty()) {
-                stringResource(R.string.brand_name, brandAttribute.value)
+            val brandAttribute =
+                productDetailUiModel.attributes.firstOrNull { it.attributeId == "BRAND" }
+            val brand = if (brandAttribute != null && !brandAttribute.valueName.isNullOrEmpty()) {
+                stringResource(R.string.brand_name, brandAttribute.valueName)
             } else {
                 stringResource(R.string.brand_name, stringResource(R.string.generic_brand))
             }
@@ -168,9 +177,10 @@ fun ProductContent(
                     .weight(0.5f)
             )
 
-            val colorAttribute = productDetailUiModel.attributes.firstOrNull { it.type == "COLOR" }
-            if (colorAttribute != null && !colorAttribute.value.isNullOrEmpty()) {
-                val strResource = stringResource(R.string.color_name, colorAttribute.value)
+            val colorAttribute =
+                productDetailUiModel.attributes.firstOrNull { it.attributeId == "COLOR" }
+            if (colorAttribute != null && !colorAttribute.valueName.isNullOrEmpty()) {
+                val strResource = stringResource(R.string.color_name, colorAttribute.valueName)
                 Text(
                     text = strResource,
                     style = MaterialTheme.typography.bodyLarge,
@@ -181,6 +191,20 @@ fun ProductContent(
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_xs)))
+
+        productDetailUiModel.originalPrice?.let {
+            Text(
+                text = it.toCurrencyString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = DarkGray
+                ),
+                textDecoration = TextDecoration.LineThrough,
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(R.dimen.padding_md))
+            )
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_xs)))
+        }
 
         Text(
             text = productDetailUiModel.price.toCurrencyString(productDetailUiModel.currencyId),
@@ -196,6 +220,77 @@ fun ProductContent(
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(R.dimen.padding_md))
             )
+        }
+
+        Spacer(
+            modifier = Modifier.height(dimensionResource(R.dimen.padding_lg))
+        )
+
+        if (!productDetailUiModel.description.isNullOrEmpty()) {
+            Text(
+                text = stringResource(R.string.product_description),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(R.dimen.padding_md))
+            )
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_xs)))
+
+            Text(
+                text = productDetailUiModel.description,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(R.dimen.padding_md))
+                    .padding(bottom = dimensionResource(R.dimen.padding_lg)),
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        ProductAttributesList(
+            list = productDetailUiModel.attributes,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun ProductAttributesList(
+    modifier: Modifier = Modifier,
+    list: List<AttributeUiModel> = emptyList()
+) {
+    Column(
+        modifier = modifier
+    ) {
+        list.forEachIndexed { index, item ->
+            if (!item.attributeName.isNullOrEmpty() && !item.valueName.isNullOrEmpty()) {
+                // Alternating row colors for better readability
+                val rowColor =
+                    if (index % 2 == 0)
+                        MaterialTheme.colorScheme.surface else
+                        MaterialTheme.colorScheme.surfaceVariant
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = rowColor)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_md))
+                        .padding(vertical = dimensionResource(R.dimen.padding_md))
+                ) {
+                    Text(
+                        text = item.attributeName,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .padding(end = dimensionResource(R.dimen.padding_lg))
+                    )
+
+                    Text(
+                        text = item.valueName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(0.5f)
+                    )
+                }
+            }
         }
     }
 }
@@ -213,9 +308,43 @@ fun ProductContentPrev() {
                     "https://example.com/image1.jpg",
                     "https://example.com/image2.jpg"
                 ),
+                attributes = listOf(
+                    AttributeUiModel(
+                        attributeId = "BRAND",
+                        attributeName = "Marca",
+                        valueName = "Marca Exemplo"
+                    ),
+                    AttributeUiModel(
+                        attributeId = "COLOR",
+                        attributeName = "Cor",
+                        valueName = "Azul"
+                    )
+                ),
                 freeShipping = true,
                 originalPrice = "120.00".toBigDecimal(),
                 description = "Descrição do produto de teste"
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ProductAttributesListPrev() {
+    MercadoLivreDevTestTheme {
+        ProductAttributesList(
+            modifier = Modifier.fillMaxSize(),
+            list = listOf(
+                AttributeUiModel(
+                    attributeId = "BRAND",
+                    attributeName = "Marca",
+                    valueName = "Marca Exemplo"
+                ),
+                AttributeUiModel(
+                    attributeId = "COLOR",
+                    attributeName = "Cor",
+                    valueName = "Azul"
+                )
             )
         )
     }

@@ -24,11 +24,13 @@ fun createMockKtorClient(context: Context): HttpClient {
         }
         engine {
             addHandler { request ->
-                // Simula delay de rede
+                // Simulate network delay
                 delay(NETWORK_DELAY_MS)
                 val searchParam = request.url.parameters["q"]
                 val idsParam = request.url.parameters["ids"]
                 val isDescription = request.url.encodedPath.endsWith("description")
+
+                // Determine the file name based on the request parameters
                 val fileName = when {
                     !idsParam.isNullOrBlank() -> {
                         val id = idsParam
@@ -42,11 +44,11 @@ fun createMockKtorClient(context: Context): HttpClient {
                         "${searchParam}-query-list.json"
                     }
                     else -> {
-                        "mock_default.json"
+                        null
                     }
                 }
                 val (json, status) = try {
-                    val content = context.assets.open(fileName).bufferedReader().use { it.readText() }
+                    val content = context.assets.open(fileName.orEmpty()).bufferedReader().use { it.readText() }
                     content to HttpStatusCode.OK
                 } catch (_: Exception) {
                     if (isDescription) {
