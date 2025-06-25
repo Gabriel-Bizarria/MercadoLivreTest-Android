@@ -1,6 +1,8 @@
 package br.com.devtest.mercadolivre.data.datasource.service
 
-import br.com.devtest.mercadolivre.data.models.SearchResponse
+import br.com.devtest.mercadolivre.data.models.productdescription.ProductDescriptionResponse
+import br.com.devtest.mercadolivre.data.models.productdetails.ProductDetailsResponse
+import br.com.devtest.mercadolivre.data.models.search.SearchResponse
 import br.com.devtest.mercadolivre.data.utils.NetworkResponse
 import br.com.devtest.mercadolivre.utils.AppLog
 import br.com.devtest.mercadolivre.utils.LogTags
@@ -34,6 +36,54 @@ class ApiService(private val client: HttpClient) {
             }
         } catch (e: Exception) {
             AppLog.e(LogTags.NETWORK, "Error on query products: ${e.message}")
+            NetworkResponse.GenericError(message = e.message ?: "Unknown error")
+        }
+    }
+
+    suspend fun queryProductDetails(productId: String): NetworkResponse<ProductDetailsResponse> {
+        return try {
+            val response = client.get("/items") {
+                parameter("ids", productId)
+            }
+
+            if (response.status.isSuccess()) {
+                NetworkResponse.Success(
+                    jsonHandler.decodeFromString<ProductDetailsResponse>(
+                        response.bodyAsText()
+                    )
+                )
+            } else {
+                NetworkResponse.NetworkError(
+                    message = response.status.description,
+                    code = response.status.value
+                )
+            }
+        } catch (e: Exception) {
+            AppLog.e(LogTags.NETWORK, "Error on query product details: ${e.message}")
+            NetworkResponse.GenericError(message = e.message ?: "Unknown error")
+        }
+    }
+
+    suspend fun queryProductDescription(productId: String): NetworkResponse<ProductDescriptionResponse> {
+        return try {
+            val response = client.get("/items/description") {
+                parameter("ids", productId)
+            }
+
+            if (response.status.isSuccess()) {
+                NetworkResponse.Success(
+                    jsonHandler.decodeFromString<ProductDescriptionResponse>(
+                        response.bodyAsText()
+                    )
+                )
+            } else {
+                NetworkResponse.NetworkError(
+                    message = response.status.description,
+                    code = response.status.value
+                )
+            }
+        } catch (e: Exception) {
+            AppLog.e(LogTags.NETWORK, "Error on query product description: ${e.message}")
             NetworkResponse.GenericError(message = e.message ?: "Unknown error")
         }
     }

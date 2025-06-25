@@ -1,10 +1,10 @@
 package br.com.devtest.mercadolivre.data.repository
 
 import br.com.devtest.mercadolivre.data.datasource.service.ApiService
-import br.com.devtest.mercadolivre.data.models.ResultsItem
-import br.com.devtest.mercadolivre.data.models.SearchResponse
+import br.com.devtest.mercadolivre.data.models.search.ResultsItem
+import br.com.devtest.mercadolivre.data.models.search.SearchResponse
 import br.com.devtest.mercadolivre.data.utils.NetworkResponse
-import br.com.devtest.mercadolivre.ui.models.ProductUiModel
+import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.utils.toBigDecimalMonetary
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -42,13 +42,12 @@ class SearchRepositoryImplTest {
         val list = (result as NetworkResponse.Success).data
         assertEquals(1, list.size)
         assertEquals(
-            ProductUiModel(
+            ProductListItemUiModel(
                 id = "1",
                 title = "Produto 1",
                 price = (10.0).toBigDecimalMonetary(),
                 isFreeShipping = false,
                 originalPrice = null,
-                brand = null,
                 currencyId = null,
                 productImage = "img.png"
             ),
@@ -120,13 +119,12 @@ class SearchRepositoryImplTest {
         val list = (result as NetworkResponse.Success).data
         assertEquals(1, list.size)
         assertEquals(
-            ProductUiModel(
+            ProductListItemUiModel(
                 id = "1",
                 title = "Produto 1",
                 price = (10.0).toBigDecimalMonetary(),
                 isFreeShipping = false,
                 originalPrice = null,
-                brand = null,
                 currencyId = null,
                 productImage = "img.png"
             ), list[0]

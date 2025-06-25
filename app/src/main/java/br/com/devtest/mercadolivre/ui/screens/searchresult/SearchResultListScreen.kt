@@ -23,14 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.devtest.mercadolivre.R
+import br.com.devtest.mercadolivre.ui.commons.components.ErrorScreen
 import br.com.devtest.mercadolivre.ui.commons.components.SearchBar
-import br.com.devtest.mercadolivre.ui.models.ProductUiModel
+import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.ui.viewmodels.SearchViewModel
 import br.com.devtest.mercadolivre.ui.state.UiState
 
 @Composable
 fun SearchResultListScreen(
     viewModel: SearchViewModel,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val query = viewModel.queryInput.collectAsStateWithLifecycle()
@@ -51,8 +53,8 @@ fun SearchResultListScreen(
             }
 
             is UiState.Error -> {
-                Text(
-                    text = (state.value as UiState.Error).message,
+                ErrorScreen(
+                    errorMessage = (state.value as UiState.Error).message,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(
@@ -62,9 +64,9 @@ fun SearchResultListScreen(
             }
 
             is UiState.Success -> {
-                val products = (state.value as UiState.Success<List<ProductUiModel>>).data
+                val products = (state.value as UiState.Success<List<ProductListItemUiModel>>).data
 
-                if(products.isEmpty()) {
+                if (products.isEmpty()) {
                     Text(
                         text = stringResource(R.string.no_product_found),
                         modifier = Modifier
@@ -72,11 +74,11 @@ fun SearchResultListScreen(
                     )
                 } else {
                     val listState = rememberLazyListState()
-                    ProductsList(list = products, listState = listState)
+                    ProductsList(list = products, listState = listState, onItemClick = onItemClick)
                 }
             }
         }
-        
+
         SearchBar(
             placeholder = stringResource(R.string.search_one_item),
             query = query.value,
@@ -95,8 +97,9 @@ fun SearchResultListScreen(
 
 @Composable
 private fun ProductsList(
-    list: List<ProductUiModel>,
+    list: List<ProductListItemUiModel>,
     listState: LazyListState,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -111,7 +114,9 @@ private fun ProductsList(
             key = { it.id }
         ) {
             SearchProductItem(
-                productItem = it, modifier = Modifier.fillMaxSize()
+                onItemClick = onItemClick,
+                productItem = it,
+                modifier = Modifier.fillMaxSize()
             )
             HorizontalDivider()
         }

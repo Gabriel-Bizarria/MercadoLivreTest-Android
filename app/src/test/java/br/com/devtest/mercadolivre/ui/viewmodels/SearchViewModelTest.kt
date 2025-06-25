@@ -3,7 +3,7 @@ package br.com.devtest.mercadolivre.ui.viewmodels
 import app.cash.turbine.test
 import br.com.devtest.mercadolivre.data.utils.NetworkResponse
 import br.com.devtest.mercadolivre.domain.repository.SearchRepository
-import br.com.devtest.mercadolivre.ui.models.ProductUiModel
+import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.ui.state.UiState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -35,13 +35,12 @@ class SearchViewModelTest {
     @Test
     fun `fetchSearchResults emits Success when repository returns data`() = testScope.runTest {
         val products = listOf(
-            ProductUiModel(
+            ProductListItemUiModel(
                 id = "1",
                 title = "Product",
                 price = 100.0.toBigDecimal(),
                 isFreeShipping = false,
                 originalPrice = null,
-                brand = null,
                 currencyId = null,
                 productImage = "Desc"
             )
