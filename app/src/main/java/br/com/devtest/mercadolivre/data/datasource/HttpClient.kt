@@ -2,6 +2,8 @@ package br.com.devtest.mercadolivre.data.datasource
 
 import android.content.Context
 import br.com.devtest.mercadolivre.data.datasource.service.NetworkConstants
+import br.com.devtest.mercadolivre.utils.AppLog
+import br.com.devtest.mercadolivre.utils.sanitize
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -35,27 +37,30 @@ fun createMockKtorClient(context: Context): HttpClient {
                     !idsParam.isNullOrBlank() -> {
                         val id = idsParam
                         if (isDescription) {
-                            "item-${id}-description.json"
+                            "item-${id.sanitize()}-description.json"
                         } else {
-                            "item-${id}.json"
+                            "item-${id.sanitize()}.json"
                         }
                     }
                     !searchParam.isNullOrBlank() -> {
-                        "${searchParam}-query-list.json"
+                        "${searchParam.sanitize().lowercase()}-query-list.json"
                     }
                     else -> {
-                        null
+                        // No search parameter provided
+                        return@addHandler respond(
+                            content = "",
+                            status = HttpStatusCode.BadRequest,
+                            headers = headersOf(HttpHeaders.ContentType, "application/json")
+                        )
                     }
                 }
+
                 val (json, status) = try {
-                    val content = context.assets.open(fileName.orEmpty()).bufferedReader().use { it.readText() }
+                    AppLog.v("NETWORK", "Mocking response for file: $fileName")
+                    val content = context.assets.open(fileName).bufferedReader().use { it.readText() }
                     content to HttpStatusCode.OK
                 } catch (_: Exception) {
-                    if (isDescription) {
-                        "" to HttpStatusCode.NotFound
-                    } else {
-                        "{}" to HttpStatusCode.OK
-                    }
+                    "" to HttpStatusCode.NotFound
                 }
 
                 respond(

@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +45,7 @@ import br.com.devtest.mercadolivre.ui.theme.MercadoLivreDevTestTheme
 import br.com.devtest.mercadolivre.ui.viewmodels.ProductDetailViewModel
 import br.com.devtest.mercadolivre.utils.AppLog
 import br.com.devtest.mercadolivre.utils.toCurrencyString
+import io.ktor.http.HttpStatusCode
 
 @Composable
 fun ProductDetailScreen(
@@ -65,9 +65,9 @@ fun ProductDetailScreen(
     when (state.value) {
         is UiState.Error -> {
             val error = (state.value as UiState.Error)
-            if (error.code != 404) {
+            if (error.code != HttpStatusCode.NotFound.value) {
                 ErrorScreen(
-                    errorMessage = error.message,
+                    error = error,
                     modifier = modifier
                         .fillMaxSize()
                         .padding(dimensionResource(R.dimen.padding_md))
@@ -241,9 +241,7 @@ fun ProductContent(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(R.dimen.padding_md))
-                    .padding(bottom = dimensionResource(R.dimen.padding_lg)),
-                maxLines = 5,
-                overflow = TextOverflow.Ellipsis
+                    .padding(bottom = dimensionResource(R.dimen.padding_lg))
             )
         }
 

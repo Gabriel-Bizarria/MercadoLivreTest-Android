@@ -10,21 +10,25 @@ import kotlin.collections.orEmpty
 
 class ProductDetailRepositoryImpl(
     private val apiService: ApiService
-): ProductDetailRepository {
+) : ProductDetailRepository {
     override suspend fun getProductDetails(productId: String): NetworkResponse<ProductDetailUiModel> {
-        val detailsRequest =  apiService.queryProductDetails(productId)
+        val detailsRequest = apiService.queryProductDetails(productId)
         val descriptionRequest = apiService.queryProductDescription(productId)
 
         return if (detailsRequest is NetworkResponse.Success && descriptionRequest is NetworkResponse.Success) {
             val details = detailsRequest.data
             val description = descriptionRequest.data
 
+            if (details.id.isNullOrEmpty() || details.title.isNullOrEmpty() || details.price == null) {
+                return NetworkResponse.GenericError("Product details not found")
+            }
+
             val productUiModel = ProductDetailUiModel(
-                id = details.id.orEmpty(),
-                title = details.title.orEmpty(),
-                price = (details.price ?: 0.0).toBigDecimalMonetary(),
+                id = details.id,
+                title = details.title,
+                price = details.price.toBigDecimalMonetary(),
                 originalPrice = (details.originalPrice)?.toBigDecimalMonetary(),
-                images = details.pictures?.map { it?.secureUrl.orEmpty() }.orEmpty(),
+                images = details.pictures?.mapNotNull { it?.secureUrl } ?: emptyList(),
                 freeShipping = details.shipping?.freeShipping == true,
                 attributes = details.attributes?.map {
                     AttributeUiModel(

@@ -25,6 +25,6 @@ val appModule = module {
         )
     }
     viewModel { (handle: SavedStateHandle) ->
-        ProductDetailViewModel(get(), handle)
+        ProductDetailViewModel(repository = get(), savedStateHandle = handle)
     }
 }
