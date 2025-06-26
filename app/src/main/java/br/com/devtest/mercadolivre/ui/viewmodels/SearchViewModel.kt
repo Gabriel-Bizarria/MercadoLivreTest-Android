@@ -1,11 +1,13 @@
 package br.com.devtest.mercadolivre.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import br.com.devtest.mercadolivre.R
 import br.com.devtest.mercadolivre.data.utils.onFailure
 import br.com.devtest.mercadolivre.data.utils.onSuccess
 import br.com.devtest.mercadolivre.domain.repository.SearchRepository
 import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.ui.state.UiState
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +25,9 @@ class SearchViewModel(
     private val _queryInput = MutableStateFlow<String>("")
     val queryInput = _queryInput.asStateFlow()
 
-    private val _searchUiState = MutableStateFlow<UiState<List<ProductListItemUiModel>>>(UiState.Loading)
-    val searchUiState = _searchUiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow<UiState<List<ProductListItemUiModel>>>(UiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
     private val viewModelCustomScope = CoroutineScope(SupervisorJob() + dispatcher)
 
@@ -34,15 +37,34 @@ class SearchViewModel(
 
     fun fetchSearchResults() {
         viewModelCustomScope.launch {
-            _searchUiState.value = UiState.Loading
+            _uiState.value = UiState.Loading
             repository.getSearchResults(queryInput.value)
                 .onSuccess { data ->
-                    _searchUiState.value = UiState.Success(data)
+                    _uiState.value = UiState.Success(data)
                 }
-                .onFailure { error, _ ->
-                    _searchUiState.value = UiState.Error(
-                        message = error
-                    )
+                .onFailure { error, code ->
+                    when (code) {
+                        HttpStatusCode.NotFound.value -> {
+                            _uiState.value = UiState.Error(
+                                messageStringRes = R.string.no_product_found,
+                                message = error,
+                            )
+                        }
+
+                        HttpStatusCode.BadRequest.value -> {
+                            _uiState.value = UiState.Error(
+                                message = error,
+                                code = code
+                            )
+                        }
+
+                        else -> {
+                            _uiState.value = UiState.Error(
+                                message = error,
+                                code = code
+                            )
+                        }
+                    }
                 }
         }
     }

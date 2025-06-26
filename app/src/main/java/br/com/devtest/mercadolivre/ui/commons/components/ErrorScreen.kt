@@ -9,15 +9,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.devtest.mercadolivre.R
+import br.com.devtest.mercadolivre.ui.state.UiState
 
 @Composable
 fun ErrorScreen(
-    errorMessage: String,
+    error: UiState.Error,
     modifier: Modifier = Modifier
 ) {
+    val errorMessage = when {
+        error.messageStringRes != null && error.messageStringRes != 0 ->
+            stringResource(id = error.messageStringRes)
+        !error.message.isNullOrEmpty() -> error.message
+        else -> stringResource(R.string.generic_error)
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -39,7 +47,7 @@ fun ErrorScreen(
 @Composable
 private fun ErrorScreenPrev() {
     ErrorScreen(
-        errorMessage = "An error occurred while loading the data.",
+        error = UiState.Error(messageStringRes = R.string.generic_error),
         modifier = Modifier
     )
 }

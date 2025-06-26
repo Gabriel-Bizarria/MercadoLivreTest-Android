@@ -36,7 +36,8 @@ fun SearchResultListScreen(
     modifier: Modifier = Modifier
 ) {
     val query = viewModel.queryInput.collectAsStateWithLifecycle()
-    val state = viewModel.searchUiState.collectAsStateWithLifecycle()
+    val state = viewModel.uiState.collectAsStateWithLifecycle()
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -53,13 +54,14 @@ fun SearchResultListScreen(
             }
 
             is UiState.Error -> {
+                val error = state.value as UiState.Error
+
                 ErrorScreen(
-                    errorMessage = (state.value as UiState.Error).message,
+                    error = error,
                     modifier = Modifier
-                        .fillMaxSize()
                         .padding(
                             dimensionResource(R.dimen.padding_md)
-                        )
+                        ).align(Alignment.Center)
                 )
             }
 

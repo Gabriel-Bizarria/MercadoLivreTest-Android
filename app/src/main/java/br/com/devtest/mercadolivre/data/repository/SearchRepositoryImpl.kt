@@ -9,7 +9,7 @@ import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel.Companion.to
 
 class SearchRepositoryImpl(private val apiService: ApiService) : SearchRepository {
     override suspend fun getSearchResults(query: String): NetworkResponse<List<ProductListItemUiModel>> {
-        val result = apiService.queryProducts(query.lowercase())
+        val result = apiService.queryProducts(query)
         return when (result) {
             is NetworkResponse.Success -> {
                 val list = result.data.results

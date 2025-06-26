@@ -1,6 +1,7 @@
 package br.com.devtest.mercadolivre.ui.models
 
 data class AttributeUiModel(
-    val type: String,
-    val value: String? = null
+    val attributeId: String,
+    val attributeName: String? = null,
+    val valueName: String? = null
 )

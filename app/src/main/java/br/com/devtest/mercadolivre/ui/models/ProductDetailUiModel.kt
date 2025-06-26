@@ -8,10 +8,10 @@ data class ProductDetailUiModel(
     val price: BigDecimal,
     val images: List<String>,
     val freeShipping: Boolean,
+    val attributes: List<AttributeUiModel> = emptyList(),
     val originalPrice: BigDecimal? = null,
     val description: String? = null,
     val currencyId: String? = null,
-    val attributes: List<AttributeUiModel> = emptyList(),
 )
 
 

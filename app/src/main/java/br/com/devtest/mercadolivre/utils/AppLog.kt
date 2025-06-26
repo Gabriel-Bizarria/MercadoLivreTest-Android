@@ -3,6 +3,10 @@ package br.com.devtest.mercadolivre.utils
 import android.util.Log
 import br.com.devtest.mercadolivre.BuildConfig
 
+/**
+ * Utility object for logging messages in the application.
+ * It checks if the build is in debug mode before logging.
+ */
 object AppLog {
     fun d(tag: String, message: String) {
         if (BuildConfig.DEBUG) {

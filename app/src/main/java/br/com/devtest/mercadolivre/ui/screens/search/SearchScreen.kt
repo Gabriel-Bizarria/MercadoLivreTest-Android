@@ -1,5 +1,6 @@
 package br.com.devtest.mercadolivre.ui.screens.search
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,6 +32,8 @@ fun SearchScreen(
     modifier: Modifier = Modifier
 ) {
     val queryInput = viewModel.queryInput.collectAsStateWithLifecycle()
+    val noInputMessage = stringResource(R.string.no_input_on_search_bar)
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -79,6 +83,10 @@ fun SearchScreen(
                     onQueryChange = viewModel::setQueryInput,
                     placeholder = stringResource(R.string.search_one_item),
                     onSearch = {
+                        if(queryInput.value.isBlank()){
+                            Toast.makeText(context, noInputMessage, Toast.LENGTH_SHORT).show()
+                            return@SearchBar
+                        }
                         viewModel.fetchSearchResults()
                         navigateToSearchResults.invoke()
                     },

@@ -23,8 +23,9 @@ data class ProductListItemUiModel(
                 title = this?.title.orEmpty(),
                 attributes = this?.attributes?.map {
                     AttributeUiModel(
-                        type = it?.id.orEmpty(),
-                        value = it?.valueName
+                        attributeId = it?.id.orEmpty(),
+                        attributeName = it?.name,
+                        valueName = it?.valueName
                     )
                 }.orEmpty(),
                 price = (this?.price ?: 0.0).toBigDecimalMonetary(),

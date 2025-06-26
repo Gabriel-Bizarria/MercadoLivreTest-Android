@@ -75,8 +75,8 @@ fun SearchProductItem(
                 .fillMaxHeight()
         ) {
             val brand = productItem.attributes
-                .firstOrNull { it.type == "BRAND" }
-                ?.value
+                .firstOrNull { it.attributeId == "BRAND" }
+                ?.valueName
                 .takeUnless { it.isNullOrEmpty() }
                 ?: stringResource(R.string.generic_brand)
 
@@ -133,8 +133,8 @@ private fun SearchProductItemPreview() {
                 originalPrice = 24999.0.toBigDecimalMonetary(),
                 attributes = listOf(
                     AttributeUiModel(
-                        value = "Sample Brand",
-                        type = "BRAND"
+                        valueName = "Sample Brand",
+                        attributeId = "BRAND"
                     ),
                 ),
                 currencyId = "BRL",
