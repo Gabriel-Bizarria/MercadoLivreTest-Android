@@ -5,12 +5,11 @@ import br.com.devtest.mercadolivre.data.utils.NetworkResponse
 import br.com.devtest.mercadolivre.domain.repository.SearchRepository
 import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel
 import br.com.devtest.mercadolivre.ui.models.ProductListItemUiModel.Companion.toProductUiModel
-import br.com.devtest.mercadolivre.utils.sanitize
 
 
 class SearchRepositoryImpl(private val apiService: ApiService) : SearchRepository {
     override suspend fun getSearchResults(query: String): NetworkResponse<List<ProductListItemUiModel>> {
-        val result = apiService.queryProducts(query.sanitize())
+        val result = apiService.queryProducts(query)
         return when (result) {
             is NetworkResponse.Success -> {
                 val list = result.data.results
